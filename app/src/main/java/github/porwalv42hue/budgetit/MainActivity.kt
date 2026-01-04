@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -38,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import github.porwalv42hue.budgetit.ui.theme.BudgetItTheme
 
 class MainActivity : ComponentActivity() {
+    private val budgetViewModel: BudgetViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -47,7 +52,8 @@ class MainActivity : ComponentActivity() {
                     floatingActionButton = {FloatingActionContainer()}
                 ) { innerPadding ->
                     Content(
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        budgetViewModel
                     )
                 }
             }
@@ -118,10 +124,31 @@ fun FloatingActionContainer() {
     }
 }
 
+enum class DivisionType {
+    INCOME, HOUSEHOLD, INVESTMENT, DONATION, TRIP, GROOMING
+}
+
 @Composable
-fun Content(modifier: Modifier = Modifier) {
-    Text(
-        text = "Remaining Budget:",
-        modifier = modifier
-    )
+fun Content(modifier: Modifier = Modifier, budgetViewModel: BudgetViewModel) {
+    Column {
+        Text(
+            text = "Remaining Budget:",
+            modifier = modifier
+        )
+
+        LazyColumn {
+            items(DivisionType.entries) { divisionType ->
+                DivisionEntry(divisionType, budgetViewModel)
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun DivisionEntry(type: DivisionType, budgetViewModel: BudgetViewModel) {
+    Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.secondary,
+        shape = RoundedCornerShape(10.dp)).padding(10.dp).fillMaxWidth()) {
+        Text("${type.name}: ${budgetViewModel.getBudget(type)}")
+    }
 }
