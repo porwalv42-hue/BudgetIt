@@ -149,6 +149,11 @@ fun Content(modifier: Modifier = Modifier, budgetViewModel: BudgetViewModel) {
 fun DivisionEntry(type: DivisionType, budgetViewModel: BudgetViewModel) {
     Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.secondary,
         shape = RoundedCornerShape(10.dp)).padding(10.dp).fillMaxWidth()) {
-        Text("${type.name}: ${budgetViewModel.getBudget(type)}")
+        Text("${getDisplayName(type)}: ${budgetViewModel.getBudget(type)}",
+            color = MaterialTheme.colorScheme.onSecondary)
     }
+}
+
+fun getDisplayName(type: DivisionType): String {
+    return type.name.lowercase().replaceFirstChar { it.titlecase() }
 }
